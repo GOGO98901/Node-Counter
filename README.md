@@ -10,6 +10,7 @@
 - Clojure / ClojureScript
 - CSS / SCSS / SASS / LESS / Stylus
 - Crystal
+- Dart
 - Erlang
 - Go
 - Groovy

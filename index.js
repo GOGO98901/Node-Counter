@@ -40,6 +40,7 @@ var extensions = [
     "cs",
     "css",
     "cxx",
+    "dart",
     "erl",
     "go",
     "groovy",
