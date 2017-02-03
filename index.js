@@ -4,6 +4,7 @@ var path = require('path');
 var pkg = require(path.join(__dirname, 'package.json'));
 var chalk = require('chalk');
 var parser = require('gitignore-parser');
+var endOfLine = require('os').EOL;
 
 var program = require('commander');
 program.version(pkg.version)
@@ -17,40 +18,50 @@ if (fs.existsSync(program.directory)) {
 } else if (program.directory != undefined) {
     console.error(chalk.red('The directory \'%s\' dose not exist'), program.directory);
     program.help();
-    process.exit(0);
+    process.exit(1);
 }
+
 var gitignore = undefined;
 if (fs.existsSync('.gitignore')) {
     gitignore = parser.compile(fs.readFileSync('.gitignore', 'utf8'));
     console.log('Filtered using .gitignore');
 }
+var noFiles = 0, noFolders = 1, noLines = 0;
 
-console.log('Scanning %s', start);
-var files = 0, folders = 1, lines = 0;
-function scan(current) {
+function scan(current, callback) {
+    if (program.output) console.log(' dir > %s', chalk.gray(current));
     var files = fs.readdirSync(current);
     if (gitignore != undefined) files = files.filter(gitignore.accepts);
-    files.forEach(file => {
-        if (fs.existsSync(file)) {
-            var stat = fs.lstatSync(file);
+    files.forEach(next => {
+        var next = path.join(current, next);
+        if (fs.existsSync(next)) {
+            var stat = fs.lstatSync(next);
             if (stat.isDirectory()) {
-                folders++;
-                scan(file);
+                noFolders++;
+                scan(next, function() {});
             } else if (stat.isFile()) {
-                files++;
-                read(file);
+                noFiles++;
+                read(next);
             }
-            if (program.output) console.log(chalk.gray(file));
         }
     });
+    callback();
 }
 
 function read(file) {
+    if (program.output) console.log('file > %s', chalk.gray(file));
     var contents = fs.readFileSync(file, 'utf8');
-    //for ()
+
+    noLines += contents.split(endOfLine).length;
+
+    // for (String line: contents.split(endOfLine)) {
+    //     noLines ++;
+    // }
 }
 
-scan(start);
-console.log("Files: %s", files);
-console.log("Folders: %s", folders);
-console.log("Lines: %s", lines);
+console.log('Scanning %s', start);
+scan(start, function() {
+    console.log("Files: %s", noFiles);
+    console.log("Folders: %s", noFolders);
+    console.log("Lines: %s", noLines);
+});
