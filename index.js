@@ -9,7 +9,7 @@ var endOfLine = require('os').EOL;
 var program = require('commander');
 program.version(pkg.version)
     .option('-d, --directory <path>', 'The directory to start the scan')
-    .option('-o, --output', 'Displays the file currently beng read')
+    .option('-o, --output', 'Displays the file currently being read')
     .parse(process.argv);
 
 var start = __dirname;

@@ -1,5 +1,22 @@
 # Node Counter
 
+## Installation
+```shell
+$ npm install git+https://github.com/GOGO98901/Node-Counter.git
+```
+
+## Usage
+```
+  Usage: counter [options]
+
+  Options:
+
+    -h, --help              output usage information
+    -V, --version           output the version number
+    -d, --directory <path>  The directory to start the scan
+    -o, --output            Displays the file currently being read
+```
+
 ## Supported languages
 
 - Assembly
