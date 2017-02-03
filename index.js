@@ -12,7 +12,7 @@ program.version(pkg.version)
     .option('-o, --output', 'Displays the file currently being read')
     .parse(process.argv);
 
-var start = __dirname;
+var start = process.cwd();
 if (fs.existsSync(program.directory)) {
     start = program.directory;
 } else if (program.directory != undefined) {
