@@ -26,9 +26,9 @@ if (fs.existsSync('.gitignore')) {
     gitignore = parser.compile(fs.readFileSync('.gitignore', 'utf8'));
     console.log('Filtered using .gitignore');
 }
-var noFiles = 0, noFolders = 1, noLines = 0;
 
 function scan(current, callback) {
+    var cFiles = 0, cFolders = 0, cLines = 0;
     if (program.output) console.log(' dir > %s', chalk.gray(current));
     var files = fs.readdirSync(current);
     if (gitignore != undefined) files = files.filter(gitignore.accepts);
@@ -37,31 +37,40 @@ function scan(current, callback) {
         if (fs.existsSync(next)) {
             var stat = fs.lstatSync(next);
             if (stat.isDirectory()) {
-                noFolders++;
-                scan(next, function() {});
+                cFolders++;
+                scan(next, function(files, folders, lines) {
+                    cFiles += files;
+                    cFolders += folders;
+                    cLines += lines;
+                });
             } else if (stat.isFile()) {
-                noFiles++;
-                read(next);
+                cFiles++;
+                read(next, function(lines) {
+                    cLines += lines;
+                });
             }
         }
     });
-    callback();
+    callback(cFiles, cFolders, cLines);
 }
 
-function read(file) {
-    if (program.output) console.log('file > %s', chalk.gray(file));
+function read(file, callback) {
     var contents = fs.readFileSync(file, 'utf8');
 
-    noLines += contents.split(endOfLine).length;
+    var lines = contents.split(endOfLine).length;
 
+    // var lines = 0;
     // for (String line: contents.split(endOfLine)) {
-    //     noLines ++;
+    //     lines ++;
     // }
+
+    if (program.output) console.log('file > %s %s line(s)', chalk.gray(file), lines);
+    callback(lines);
 }
 
 console.log('Scanning %s', start);
-scan(start, function() {
-    console.log("Files: %s", noFiles);
-    console.log("Folders: %s", noFolders);
-    console.log("Lines: %s", noLines);
+scan(start, function(files, folders, lines) {
+    console.log("Files: %s", files);
+    console.log("Folders: %s", folders);
+    console.log("Lines: %s", lines);
 });
