@@ -24,8 +24,6 @@ if (fs.existsSync(program.directory)) {
     process.exit(1);
 }
 
-console.log(program.args);
-
 var gitignore = undefined;
 var gitignorePath = path.join(start, '.gitignore');
 if (fs.existsSync(gitignorePath) && !program.nogitignore) {
