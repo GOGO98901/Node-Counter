@@ -6,7 +6,7 @@ var chalk = require('chalk');
 
 var program = require('commander');
 program.version(pkg.version)
-    .option('-d, --directory <folder>', 'The directory to start the scan')
+    .option('-d, --directory <path>', 'The directory to start the scan')
     .option('-o, --output', 'Displays the file currently beng read')
     .parse(process.argv);
 
@@ -14,7 +14,8 @@ var start = __dirname;
 if (fs.existsSync(program.directory)) {
     start = program.directory;
 } else if (program.directory != undefined) {
-    console.error(chalk.red('WARNING: The directory \'%s\' dose not exist'), program.directory);
+    console.error(chalk.red('The directory \'%s\' dose not exist'), program.directory);
+    program.help();
     process.exit(0);
 }
 
