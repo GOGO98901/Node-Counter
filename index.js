@@ -135,12 +135,15 @@ function scan(current, callback) {
         if (next === '.git') return;
         var next = path.join(current, next);
         if (program.args != undefined) if (program.args.length > 0) {
-            var doContinue = false;
+            var match = false;
             program.args.forEach(arg => {
-                if (next.match(arg) != null) doContinue = true;
-                if (doContinue) return;
+                if (next.match(arg) != null) match = true;
+                if (match) return;
             });
-            if (doContinue) return;
+            if (match) {
+                if (program.output) console.log('skip > %s', chalk.red(next));
+                return;
+            }
         }
         if (fs.existsSync(next)) {
             var stat = fs.lstatSync(next);
@@ -185,7 +188,7 @@ function read(file, callback) {
         //     lines ++;
         // }
 
-        if (program.output) console.log('file > %s %s line(s)', chalk.gray(file), lines);
+        if (program.output) console.log('file > %s %s line(s)', chalk.cyan(file), lines);
     } catch (e) {
         lines = 0;
         console.error(chalk.red('file > %s ' + chalk.red('failed to read')), chalk.gray(file));

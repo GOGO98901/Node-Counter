@@ -82,4 +82,4 @@ $ npm install git+https://github.com/GOGO98901/Node-Counter.git
 
 ## License
 
-Node Counter is licensed under the MIT license
+MIT © [Rory Claasen](http://roryclaasen.me)
