@@ -1,6 +1,6 @@
 {
   "name": "code-counter",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "A command line program to count lines of code",
   "main": "index.js",
   "scripts": {
