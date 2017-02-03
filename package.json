@@ -1,22 +1,26 @@
 {
-    "name": "code-counter",
-    "version": "0.0.1",
-    "description": "",
-    "main": "index.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/GOGO98901/Node-Counter.git"
-    },
-    "bin": {
-        "counter": "./index.js"
-    },
-    "author": "Rory Claasen",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/GOGO98901/Node-Counter/issues"
-    },
-    "homepage": "https://github.com/GOGO98901/Node-Counter#readme"
+  "name": "code-counter",
+  "version": "0.0.1",
+  "description": "A command line program to count lines of code",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GOGO98901/Node-Counter.git"
+  },
+  "bin": {
+    "counter": "./index.js"
+  },
+  "author": "Rory Claasen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/GOGO98901/Node-Counter/issues"
+  },
+  "homepage": "https://github.com/GOGO98901/Node-Counter#readme",
+  "dependencies": {
+    "chalk": "^1.1.3",
+    "commander": "^2.9.0"
+  }
 }
