@@ -17,13 +17,16 @@ $ npm install git+https://github.com/GOGO98901/Node-Counter.git
 ## Usage
 
 ```
-  Usage: counter [options]
+  Usage: counter [options] [filterRegex...]
+
+  A command line program to count lines in a source code file
 
   Options:
 
     -h, --help              output usage information
     -V, --version           output the version number
     -d, --directory <path>  The directory to start the scan
+    -g, --nogitignore       Turns off the ability to use gitignore
     -o, --output            Displays the file currently being read
 ```
 
