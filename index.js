@@ -115,41 +115,53 @@ function scan(current, callback) {
             var stat = fs.lstatSync(next);
             if (stat.isDirectory()) {
                 cFolders++;
-                scan(next, function(files, folders, lines) {
-                    cFiles += files;
-                    cFolders += folders;
-                    cLines += lines;
+                scan(next, function(data) {
+                    cFiles += data.files;
+                    cFolders += data.folders;
+                    cLines += data.lines;
                 });
             } else if (stat.isFile()) {
                 if (extensionsContains(next.split('.').pop())) {
                     cFiles++;
-                    read(next, function(lines) {
-                        cLines += lines;
+                    read(next, function(data) {
+                        cLines += data.lines;
                     });
                 }
             }
         }
     });
-    callback(cFiles, cFolders, cLines);
+    callback({
+        'files': cFiles,
+        'folders': cFolders,
+        'lines': cLines
+    });
 }
 
 function read(file, callback) {
-    var contents = fs.readFileSync(file, 'utf8');
+    var lines = 0;
+    try {
+        var contents = fs.readFileSync(file, 'utf8');
 
-    var lines = contents.split(endOfLine).length;
+        lines = contents.split(endOfLine).length;
 
-    // var lines = 0;
-    // for (String line: contents.split(endOfLine)) {
-    //     lines ++;
-    // }
+        // for (String line: contents.split(endOfLine)) {
+        //     lines ++;
+        // }
 
-    if (program.output) console.log('file > %s %s line(s)', chalk.gray(file), lines);
-    callback(lines);
+        if (program.output) console.log('file > %s %s line(s)', chalk.gray(file), lines);
+    } catch (e) {
+        lines = 0;
+        console.error(chalk.red('file > %s ' + chalk.red('failed to read')), chalk.gray(file));
+        if (program.output) console.error(chalk.red(e));
+    }
+    callback({
+        'lines': lines
+    });
 }
 
 console.log('Scanning %s', start);
-scan(start, function(files, folders, lines) {
-    console.log("Folders Scanned: %s", folders);
-    console.log("Files: %s", files);
-    console.log("Lines: %s", lines);
+scan(start, function(data) {
+    console.log(chalk.green('Folders Scanned: %s'), data.folders);
+    console.log(chalk.green('Files: %s'), data.files);
+    console.log(chalk.green('Lines: %s'), data.lines);
 });
