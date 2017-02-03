@@ -24,7 +24,83 @@ if (fs.existsSync(program.directory)) {
 var gitignore = undefined;
 if (fs.existsSync('.gitignore')) {
     gitignore = parser.compile(fs.readFileSync('.gitignore', 'utf8'));
-    console.log('Filtered using .gitignore');
+    console.log('Filtering using .gitignore');
+}
+
+var extensions = [
+    "asm",
+    "brs",
+    "c",
+    "cc",
+    "clj",
+    "cljs",
+    "coffee",
+    "cpp",
+    "cr",
+    "cs",
+    "css",
+    "cxx",
+    "erl",
+    "go",
+    "groovy",
+    "gs",
+    "h",
+    "handlebars", "hbs",
+    "hpp",
+    "hr",
+    "hs",
+    "html", "htm",
+    "hx",
+    "hxx",
+    "hy",
+    "iced",
+    "ino",
+    "jade",
+    "java",
+    "jl",
+    "js",
+    "jsx",
+    "kt",
+    "kts",
+    "less",
+    "lua",
+    "ls",
+    "ml",
+    "mli",
+    "mochi",
+    "monkey",
+    "mustache",
+    "nix",
+    "nim",
+    "nut",
+    "php", "php5",
+    "pl",
+    "py",
+    "r",
+    "rb",
+    "rkt",
+    "rs",
+    "sass",
+    "scala",
+    "scss",
+    "styl",
+    "svg",
+    "swift",
+    "ts",
+    "tsx",
+    "vb",
+    "xml",
+    "yaml",
+    "m",
+    "mm"
+]
+
+function extensionsContains(extention) {
+    var i = extensions.length;
+    while (i--) {
+        if (extensions[i] === extention) return true;
+    }
+    return false;
 }
 
 function scan(current, callback) {
@@ -44,10 +120,12 @@ function scan(current, callback) {
                     cLines += lines;
                 });
             } else if (stat.isFile()) {
-                cFiles++;
-                read(next, function(lines) {
-                    cLines += lines;
-                });
+                if (extensionsContains(next.split('.').pop())) {
+                    cFiles++;
+                    read(next, function(lines) {
+                        cLines += lines;
+                    });
+                }
             }
         }
     });
@@ -70,7 +148,7 @@ function read(file, callback) {
 
 console.log('Scanning %s', start);
 scan(start, function(files, folders, lines) {
+    console.log("Folders Scanned: %s", folders);
     console.log("Files: %s", files);
-    console.log("Folders: %s", folders);
     console.log("Lines: %s", lines);
 });
