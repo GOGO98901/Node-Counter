@@ -1,6 +1,12 @@
 # Node Counter
 
 ## Installation
+From [npm](https://www.npmjs.com/package/code-counter).
+```shell
+$ npm install code-counter
+```
+From [github](https://github.com/GOGO98901/Node-Counter).
+This is not recommended as the package may be broken
 ```shell
 $ npm install git+https://github.com/GOGO98901/Node-Counter.git
 ```
