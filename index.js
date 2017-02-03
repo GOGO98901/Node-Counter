@@ -9,6 +9,7 @@ var endOfLine = require('os').EOL;
 
 var program = require('commander');
 program.version(pkg.version).description(pkg.description)
+    .arguments('[filterRegex...]')
     .option('-d, --directory <path>', 'The directory to start the scan')
     .option('-g, --nogitignore', 'Turns off the ability to use gitignore (on by default)')
     .option('-o, --output', 'Displays the file currently being read')
@@ -23,11 +24,12 @@ if (fs.existsSync(program.directory)) {
     process.exit(1);
 }
 
+console.log(program.args);
+
 var gitignore = undefined;
 var gitignorePath = path.join(start, '.gitignore');
 if (fs.existsSync(gitignorePath) && !program.nogitignore) {
     gitignore = parser.compile(fs.readFileSync(gitignorePath, 'utf8'));
-    console.log(fs.readFileSync(gitignorePath, 'utf8'));
     console.log('Filtering using .gitignore');
 }
 
@@ -132,6 +134,14 @@ function scan(current, callback) {
     files.forEach(next => {
         if (next === '.git') return;
         var next = path.join(current, next);
+        if (program.args != undefined) if (program.args.length > 0) {
+            var doContinue = false;
+            program.args.forEach(arg => {
+                if (next.match(arg) != null) doContinue = true;
+                if (doContinue) return;
+            });
+            if (doContinue) return;
+        }
         if (fs.existsSync(next)) {
             var stat = fs.lstatSync(next);
             if (stat.isDirectory()) {
@@ -143,7 +153,8 @@ function scan(current, callback) {
                     languages = combine(languages, data.languages);
                 });
             } else if (stat.isFile()) {
-                var ext = next.split('.').pop();
+                var file = next.split('/').pop();
+                var ext = file.split('.').pop();
                 if (extensionsContains(ext)) {
                     cFiles++;
                     read(next, function(data) {
@@ -188,9 +199,9 @@ function read(file, callback) {
 console.log('Scanning \'%s\'', start);
 scan(start, function(data) {
     console.log();
-    console.log(chalk.green('Folders Scanned: %s'), data.folders);
-    console.log(chalk.green('Files: %s'), data.files);
-    console.log(chalk.green('Lines: %s'), data.lines);
+    console.log('Folders Scanned: %s', data.folders);
+    console.log('     Files Read: %s', data.files);
+    console.log('    Total Lines: %s', data.lines);
     var percent = 0;
 
     var langData = [];
@@ -208,5 +219,6 @@ scan(start, function(data) {
             description: {maxWidth: 30}
         }
     });
+    console.log();
     console.log(columns)
 });
