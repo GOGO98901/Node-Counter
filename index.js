@@ -4,11 +4,13 @@ var path = require('path');
 var pkg = require(path.join(__dirname, 'package.json'));
 var chalk = require('chalk');
 var parser = require('gitignore-parser');
+var columnify = require('columnify')
 var endOfLine = require('os').EOL;
 
 var program = require('commander');
-program.version(pkg.version)
+program.version(pkg.version).description(pkg.description)
     .option('-d, --directory <path>', 'The directory to start the scan')
+    .option('-g, --nogitignore', 'Turns off the ability to use gitignore (on by default)')
     .option('-o, --output', 'Displays the file currently being read')
     .parse(process.argv);
 
@@ -22,14 +24,17 @@ if (fs.existsSync(program.directory)) {
 }
 
 var gitignore = undefined;
-if (fs.existsSync('.gitignore')) {
-    gitignore = parser.compile(fs.readFileSync('.gitignore', 'utf8'));
+var gitignorePath = path.join(start, '.gitignore');
+if (fs.existsSync(gitignorePath) && !program.nogitignore) {
+    gitignore = parser.compile(fs.readFileSync(gitignorePath, 'utf8'));
+    console.log(fs.readFileSync(gitignorePath, 'utf8'));
     console.log('Filtering using .gitignore');
 }
 
 var extensions = [
     "asm",
     "brs",
+    "bat", "cmd",
     "c",
     "cc",
     "clj",
@@ -84,6 +89,7 @@ var extensions = [
     "sass",
     "scala",
     "scss",
+    "sh",
     "styl",
     "svg",
     "swift",
@@ -104,12 +110,27 @@ function extensionsContains(extention) {
     return false;
 }
 
+function combine(data1, data2) {
+    var result = {};
+    for (var key in data1) result[key] = data1[key];
+    for (var key in data2) {
+        if (key in result) result[key] += data2[key];
+        else result[key] = data2[key];
+
+    }
+    return result;
+}
+
 function scan(current, callback) {
-    var cFiles = 0, cFolders = 0, cLines = 0;
+    var cFiles = 0, cFolders = 0, cLines = 0, languages = {};
+
     if (program.output) console.log(' dir > %s', chalk.gray(current));
+
     var files = fs.readdirSync(current);
     if (gitignore != undefined) files = files.filter(gitignore.accepts);
+
     files.forEach(next => {
+        if (next === '.git') return;
         var next = path.join(current, next);
         if (fs.existsSync(next)) {
             var stat = fs.lstatSync(next);
@@ -119,12 +140,16 @@ function scan(current, callback) {
                     cFiles += data.files;
                     cFolders += data.folders;
                     cLines += data.lines;
+                    languages = combine(languages, data.languages);
                 });
             } else if (stat.isFile()) {
-                if (extensionsContains(next.split('.').pop())) {
+                var ext = next.split('.').pop();
+                if (extensionsContains(ext)) {
                     cFiles++;
                     read(next, function(data) {
                         cLines += data.lines;
+                        if (ext in languages) languages[ext] += data.lines;
+                        else languages[ext] = data.lines;
                     });
                 }
             }
@@ -133,7 +158,8 @@ function scan(current, callback) {
     callback({
         'files': cFiles,
         'folders': cFolders,
-        'lines': cLines
+        'lines': cLines,
+        'languages': languages
     });
 }
 
@@ -159,9 +185,28 @@ function read(file, callback) {
     });
 }
 
-console.log('Scanning %s', start);
+console.log('Scanning \'%s\'', start);
 scan(start, function(data) {
+    console.log();
     console.log(chalk.green('Folders Scanned: %s'), data.folders);
     console.log(chalk.green('Files: %s'), data.files);
     console.log(chalk.green('Lines: %s'), data.lines);
+    var percent = 0;
+
+    var langData = [];
+    for (var lang in data.languages) {
+        var outData = {};
+        outData.extention = lang;
+        outData.lines = data.languages[lang];
+        outData.percent = ((data.languages[lang] / data.lines) * 100).toFixed(3) + '%';
+        langData.push(outData);
+    }
+
+    var columns = columnify(langData, {
+        minWidth: 20,
+        config: {
+            description: {maxWidth: 30}
+        }
+    });
+    console.log(columns)
 });

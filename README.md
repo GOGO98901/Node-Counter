@@ -1,6 +1,9 @@
 # Node Counter
 
+A command line program to count lines in a source code file
+
 ## Installation
+
 From [npm](https://www.npmjs.com/package/code-counter).
 ```shell
 $ npm install code-counter
@@ -12,6 +15,7 @@ $ npm install git+https://github.com/GOGO98901/Node-Counter.git
 ```
 
 ## Usage
+
 ```
   Usage: counter [options]
 
@@ -26,6 +30,7 @@ $ npm install git+https://github.com/GOGO98901/Node-Counter.git
 ## Supported languages
 
 - Assembly
+- Batch
 - Brightscript
 - CoffeeScript / IcedCoffeeScript
 - C / C++
@@ -65,6 +70,7 @@ $ npm install git+https://github.com/GOGO98901/Node-Counter.git
 - Ruby
 - Rust
 - Scala
+- Shell
 - Squirrel
 - SVG
 - Swift
